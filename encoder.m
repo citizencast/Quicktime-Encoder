@@ -1,4 +1,4 @@
-//$ cc mov23gp.m -framework QTKit -framework Foundation -framework AppKit
+//$ cc encoder.m -framework QTKit -framework Foundation -framework AppKit
 
 #import <QTKit/QTKit.h>
 
