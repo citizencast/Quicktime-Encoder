@@ -47,6 +47,8 @@ int main (int ac, char**av)
 	
 	NSLog(@" ImageSize %@", NSStringFromSize([image size]));
 	
+	// Hack to avoid warning. Startup function to call when running Cocoa code from a Carbon application.
+	NSApplicationLoad();
 	[[image TIFFRepresentationUsingCompression:NSJPEGFileType factor:80.0] writeToFile:@"/tmp/sample.jpg" atomically:YES];
 
 	[pool release];
