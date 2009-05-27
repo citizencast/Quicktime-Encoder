@@ -1,3 +1,5 @@
+//$ cc mov23gp.m -framework QTKit -framework Foundation
+
 #import <QTKit/QTKit.h>
 
 int main (int ac, char**av)
@@ -21,19 +23,31 @@ int main (int ac, char**av)
 	NSLog(@" QTTrackBoundsAttribute      %@", NSStringFromRect([[track attributeForKey:QTTrackBoundsAttribute] rectValue]));
 	NSLog(@" QTTrackDimensionsAttribute  %@", NSStringFromSize([[track attributeForKey:QTTrackDimensionsAttribute] sizeValue]));
 	
-	//	QTMovieApertureModeClean
-	[movie setAttribute:QTMovieApertureModeClean
-				 forKey: QTMovieApertureModeAttribute];
-	
 	[movie setAttribute:[NSValue valueWithSize:
 						 NSMakeSize(620, 240)]
 				 forKey: QTMovieCurrentSizeAttribute];
 	
 	NSDictionary *dictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-									[NSNumber numberWithBool:YES], QTMovieExport,
-									[NSNumber numberWithLong:'FLV1'], QTMovieExportType, nil];
+								[NSNumber numberWithBool:YES], QTMovieExport,
+								[NSNumber numberWithLong:'FLV1'], QTMovieExportType, nil];
 	
-	[movie writeToFile:@"/tmp/sample.flv" withAttributes:dictionary];
+//	[movie writeToFile:@"/tmp/sample.flv" withAttributes:dictionary];
+	
+//	dictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+//				  [NSNumber numberWithBool:YES], QTMovieExport,
+//				  [NSNumber numberWithLong:'PICT'], QTMovieExportType,
+//				  @"jpeg", QTAddImageCodecType, nil];
+//	
+//	[movie writeToFile:@"/tmp/sample.jpg" withAttributes:dictionary];
+	
+	QTTime time = QTTimeFromString(@"00:00:00:10.00/1");
+	NSLog(@" Time %@", QTStringFromTime(time));
+	
+	NSImage *image = [movie frameImageAtTime:time];
+	
+	NSLog(@" ImageSize %@", NSStringFromSize([image size]));
+	
+	[[image TIFFRepresentationUsingCompression:NSJPEGFileType factor:80.0] writeToFile:@"/tmp/sample.jpg" atomically:YES];
 
 	[pool release];
 	
