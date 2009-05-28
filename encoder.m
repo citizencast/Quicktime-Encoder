@@ -17,6 +17,33 @@ int parse_arguments(int ac, char **av, char **input, char **output)
   return (1);
 }
 
+NSSize resize_with_aspect_ratio(NSSize current_size, NSSize ideal_size)
+{
+  float current_ratio = current_size.width / current_size.height;
+  float ideal_ratio = ideal_size.width / ideal_size.height;
+  
+  float width = ideal_size.width;
+  float height = ideal_size.height;
+  
+  // Perfect case : current ratio match ideal ratio
+  if (current_ratio == ideal_ratio)
+  {
+    return (ideal_size);
+  }
+  // Height needs to be reduced
+  else if (current_ratio > ideal_ratio)
+  {
+    height = current_size.height / current_size.width * ideal_size.width;
+  }
+  // Width needs to be reduced
+  else if (current_ratio < ideal_ratio)
+  {
+    width = current_size.width / current_size.height * ideal_size.height;
+  }
+  
+  return(NSMakeSize(width, height));
+}
+
 QTMovie *open_movie(char *file)
 {
   NSError *error = nil;  
@@ -55,6 +82,13 @@ NSString *append_path_extension(NSString *path, NSString *ext)
 
 void encode_movie(QTMovie *movie, char *dest)
 {
+  NSSize encoded_movie_dimensions =
+    resize_with_aspect_ratio(
+      [[movie attributeForKey:QTMovieNaturalSizeAttribute] sizeValue],
+      NSMakeSize(320, 240));
+  
+  NSLog(@"Encoded video dimensions: %@", NSStringFromSize(encoded_movie_dimensions));
+  
   [movie setAttribute:[NSValue valueWithSize:
              NSMakeSize(320, 240)]
          forKey: QTMovieCurrentSizeAttribute];
@@ -83,8 +117,11 @@ void export_thumbnail(QTMovie *movie, char *dest)
   NSString *dest_with_jpg_extension =
     append_path_extension([NSString stringWithCString:dest], @"jpg");
   
-  [[image TIFFRepresentationUsingCompression:NSJPEGFileType factor:80.0]
-      writeToFile:dest_with_jpg_extension atomically:YES];
+  NSData *imageData = [image  TIFFRepresentation];
+  NSBitmapImageRep *imageRep = [NSBitmapImageRep imageRepWithData:imageData];
+  NSDictionary *imageProps = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:0.9] forKey:NSImageCompressionFactor];
+  imageData = [imageRep representationUsingType:NSJPEGFileType properties:imageProps];
+  [imageData writeToFile:dest_with_jpg_extension atomically:NO];
 }
 
 int main (int ac, char**av)
@@ -111,8 +148,6 @@ int main (int ac, char**av)
     }  
   }  
   
-
   [pool release];
-  
   exit(1);
 }
