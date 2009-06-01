@@ -1,4 +1,4 @@
-//$ cc encoder.m -framework QTKit -framework Foundation -framework AppKit
+//$ cc -o encoder encoder.m -framework QTKit -framework Foundation -framework AppKit -W
 
 #import <QTKit/QTKit.h>
 #import <stdio.h>
@@ -149,5 +149,5 @@ int main (int ac, char**av)
   }  
   
   [pool release];
-  exit(1);
+  exit(0);
 }
