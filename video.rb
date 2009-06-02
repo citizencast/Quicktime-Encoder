@@ -89,7 +89,7 @@ class Video
   def encode_video
     raise unless @file
 
-    cmd = "./encoder #{@file.path} #{title}"
+    cmd = "./bin/encoder #{@file.path} #{title}"
     system(cmd)
   end
 
