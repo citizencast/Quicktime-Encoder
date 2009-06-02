@@ -9,7 +9,7 @@ require 'progressbar'
 require 'aws/s3'
 
 # A Sqlite3 connection to a database file:
-DataMapper.setup(:default, "sqlite3:///#{Dir.pwd}/db.sqlite3")
+DataMapper.setup(:default, "sqlite3:///#{Dir.pwd}/db/db.sqlite3")
 
 def connect_to_s3
   AWS::S3::Base.establish_connection!(
