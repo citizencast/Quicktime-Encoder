@@ -36,9 +36,9 @@ class Video
       return false
     end
     
-    success = download_video && encode_video && upload_to_s3
+    success = download_video && encode_video && upload_to_s3 && update_merb_application
     puts "-- SUCCESS: #{success} --"
-    self.save
+    raise self.errors unless self.save
     
     return true
   end
@@ -69,6 +69,27 @@ class Video
     Array.new(5) { rand(10) }.join
   end
   
+  def update_merb_application
+    # TODO: Dynamic id
+    url = ::URI.parse("http://ec2-174-129-124-26.compute-1.amazonaws.com/videos/#{self.id}.xml")
+    req = Net::HTTP::Put.new(url.path)
+
+    req.set_form_data(
+      'video[thumbnail]' => thumbnail,
+      'video[encoded]' => video
+    )
+
+    resp = Net::HTTP.new( url.host, url.port ).start{ |http| http.request( req )}
+    raise unless resp.code == '200'
+    
+    url = ::URI.parse("http://ec2-174-129-124-26.compute-1.amazonaws.com/videos/#{self.id}/ping_remote_app")
+    req = Net::HTTP::Put.new(url.path)
+    resp = Net::HTTP.new( url.host, url.port ).start{ |http| http.request( req )}
+    raise unless resp.code == '200'
+    
+    true
+  end
+  
   def upload_to_s3
     connect_to_s3
 
@@ -80,8 +101,8 @@ class Video
       puts "http://s3.amazonaws.com/encoded-videos/#{path}"
     end
     
-    video     = "http://s3.amazonaws.com/encoded-videos/#{title}.flv"
-    thumbnail = "http://s3.amazonaws.com/encoded-videos/#{title}.jpg"
+    self.video     = "http://s3.amazonaws.com/encoded-videos/#{title}.flv"
+    self.thumbnail = "http://s3.amazonaws.com/encoded-videos/#{title}.jpg"
 
     true
   end
