@@ -1,7 +1,8 @@
 javan-whenever  http://gems.github.com
 datamapper
 progressbar
-aws/s3
 hpricot
 json_pure
 sqlite3-ruby
+aws-s3
+do_sqlite3
