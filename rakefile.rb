@@ -12,10 +12,13 @@ namespace :gems do
     File.open(".gems").readlines.each do |line|
       line.chomp!
       gem_name, source = line.split
-      cmd = "gem install #{gem_name} --source http://gems.rubyforge.org"
-      cmd += " --source #{source}" if source
-      puts cmd
-      raise unless system(cmd)
+      # Check if the gem is allready installed
+      unless system "gem query -i -n '#{gem_name}'"
+        cmd = "gem install #{gem_name} --source http://gems.rubyforge.org"
+        cmd += " --source #{source}" if source
+        puts cmd
+        raise unless system(cmd)
+      end
     end
   end
 end
