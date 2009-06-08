@@ -11,9 +11,15 @@ role :db,  "192.168.0.3", :primary => true
 namespace :deploy do
   desc "Install gems"
   task :install_gems, :roles => :app do
-    run <<-CMD
-      cd #{release_path} && rake gems:install
-    CMD
+    run "cd #{release_path} && rake gems:install"
   end
   after "deploy:update_code", "deploy:install_gems"
+  
+  desc "Update the crontab file"
+    task :update_crontab, :roles => :db do
+      run "cd #{release_path} && whenever --update-crontab #{application}"
+    end
+  end
+  after "deploy:symlink", "deploy:update_crontab"
+  
 end
