@@ -2,7 +2,7 @@ namespace :db do
   desc "migrate"
   task(:migrate) do
     require 'video'    
-    p DataMapper.auto_migrate!
+    p DataMapper.auto_upgrade!
   end
 end
 
