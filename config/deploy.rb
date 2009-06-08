@@ -16,9 +16,8 @@ namespace :deploy do
   after "deploy:update_code", "deploy:install_gems"
   
   desc "Update the crontab file"
-    task :update_crontab, :roles => :db do
-      run "cd #{release_path} && whenever --update-crontab #{application}"
-    end
+  task :update_crontab, :roles => :db do
+    run "cd #{release_path} && /Users/yvon/.gem/ruby/1.8/bin/whenever --update-crontab #{application}"
   end
   after "deploy:symlink", "deploy:update_crontab"
   
