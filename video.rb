@@ -11,6 +11,8 @@ require 'aws/s3'
 # A Sqlite3 connection to a database file:
 DataMapper.setup(:default, "sqlite3:///#{Dir.pwd}/db/db.sqlite3")
 
+require 'config/env.rb' if File.exists?('config/env.rb')
+
 def connect_to_s3
   AWS::S3::Base.establish_connection!(
     :access_key_id     =>  ENV['AMAZON_ACCESS_KEY_ID'],

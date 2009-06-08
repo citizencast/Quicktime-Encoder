@@ -9,6 +9,16 @@ role :web, "192.168.0.3"
 role :db,  "192.168.0.3", :primary => true
 
 namespace :deploy do
+  def current_or_latest_directory
+    migrate_target = fetch(:migrate_target, :latest)
+    
+    directory = case migrate_target.to_sym
+      when :current then current_path
+      when :latest  then current_release
+      else raise ArgumentError, "unknown migration target #{migrate_target.inspect}"
+      end
+  end
+  
   desc "Install gems"
   task :install_gems, :roles => :app do
     run "cd #{release_path} && rake gems:install"
@@ -17,8 +27,9 @@ namespace :deploy do
   
   desc "Compile encoder"
   task :compile, :roles => :app do
-    run "cd #{release_path} && make"
+    run "cd #{current_or_latest_directory} && make"
   end
+  after "deploy:update_code", "deploy:compile"
   
   desc "Update the crontab file"
   task :update_crontab, :roles => :db do
@@ -28,21 +39,15 @@ namespace :deploy do
   
   task :migrate, :roles => :db, :only => { :primary => true } do
     rake = fetch(:rake, "rake")
-    migrate_target = fetch(:migrate_target, :latest)
 
-    directory = case migrate_target.to_sym
-      when :current then current_path
-      when :latest  then current_release
-      else raise ArgumentError, "unknown migration target #{migrate_target.inspect}"
-      end
-
-    run "cd #{directory}; #{rake} db:migrate"
+    run "cd #{current_or_latest_directory}; #{rake} db:migrate"
   end
   
   desc "Set up symb links"
   task :symlinks, :roles => :app do
     run <<-CMD
-      ln -s #{shared_path}/db.sqlite3 #{latest_release}/db
+      ln -s #{shared_path}/db.sqlite3 #{latest_release}/db && \
+      ln -s #{shared_path}/env.rb #{latest_release}/config
     CMD
   end
   after "deploy:finalize_update", "deploy:symlinks"
