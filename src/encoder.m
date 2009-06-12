@@ -145,7 +145,11 @@ int main (int ac, char**av)
       // Export movie and thumbnail
       encode_movie(movie, output);
       export_thumbnail(movie, output);
-    }  
+    }
+    else
+    {
+      exit(-1);
+    }
   }  
   
   [pool release];
