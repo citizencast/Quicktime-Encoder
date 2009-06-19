@@ -30,6 +30,10 @@ class Video
   property :thumbnail,            String,   :size => 200
   property :video,                String,   :size => 200
   
+  def file= file_path
+    @file = File.new(file_path)
+  end
+  
   def proceed
     puts "Processing video #{id} (#{url})..."
     
@@ -38,8 +42,12 @@ class Video
       return false
     end
     
-    success = download_video && encode_video && upload_to_s3 && update_merb_application
-    puts "-- SUCCESS: #{success} --"
+    begin
+      success = download_video && encode_video && upload_to_s3 && update_merb_application
+      puts "-- SUCCESS: #{success} --"
+    rescue
+      puts "-- ERROR ! --"
+    end
     raise self.errors unless self.save
     
     return true
@@ -113,6 +121,7 @@ class Video
     raise unless @file
 
     cmd = "./bin/encoder #{@file.path} #{title}"
+    puts cmd
     system(cmd)
   end
 
