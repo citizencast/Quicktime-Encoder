@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 
-require 'video'
+require 'rescuer'
 
-Video.fetch_non_encoded_videos.each do |video|
-  video.proceed
-end
+Rescuer.do_rescue
+
+# Video.fetch_non_encoded_videos.each do |video|
+  # video.proceed
+# end

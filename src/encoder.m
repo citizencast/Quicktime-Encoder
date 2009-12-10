@@ -19,29 +19,22 @@ int parse_arguments(int ac, char **av, char **input, char **output)
 
 NSSize resize_with_aspect_ratio(NSSize current_size, NSSize ideal_size)
 {
-  float current_ratio = current_size.width / current_size.height;
-  float ideal_ratio = ideal_size.width / ideal_size.height;
-  
-  float width = ideal_size.width;
-  float height = ideal_size.height;
-  
-  // Perfect case : current ratio match ideal ratio
-  if (current_ratio == ideal_ratio)
-  {
-    return (ideal_size);
+	float current_width = current_size.width;
+	float current_height = current_size.height;
+	float adjust_width = 1.0;
+	float adjust_height = 1.0;
+
+  if (current_width > 320) {
+		adjust_width = 320 / current_width;
   }
-  // Height needs to be reduced
-  else if (current_ratio > ideal_ratio)
-  {
-    height = current_size.height / current_size.width * ideal_size.width;
+
+  if (current_height > 240) {
+		adjust_height = 240 / current_height;
   }
-  // Width needs to be reduced
-  else if (current_ratio < ideal_ratio)
-  {
-    width = current_size.width / current_size.height * ideal_size.height;
-  }
-  
-  return(NSMakeSize(width, height));
+
+	float adjust = adjust_height < adjust_width ? adjust_height : adjust_width;
+
+	return(NSMakeSize(current_width * adjust, current_height * adjust));
 }
 
 QTMovie *open_movie(char *file)
