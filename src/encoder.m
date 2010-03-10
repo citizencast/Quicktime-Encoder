@@ -17,6 +17,29 @@ int parse_arguments(int ac, char **av, char **input, char **output)
   return (1);
 }
 
+NSString *append_path_extension(NSString *path, NSString *ext)
+{
+  NSString *path_with_extension = nil;
+  
+  // Remove the extension (if present), then add the new one.
+  path_with_extension =
+    [[path stringByDeletingPathExtension] stringByAppendingPathExtension:ext];
+    
+  NSLog(@"Path: %@", path_with_extension);
+  
+  return (path_with_extension);
+}
+
+NSString *append_hd_extension(NSString *path)
+{
+  NSString *path_with_extension = nil;
+  
+  path_with_extension = [[path stringByDeletingPathExtension] stringByAppendingString:[NSString stringWithCString:"-HD.mp4"]];
+  NSLog(@"Path: %@", path_with_extension);
+  
+  return (path_with_extension);
+}
+
 NSSize resize_with_aspect_ratio(NSSize current_size, NSSize ideal_size)
 {
 	float current_width = current_size.width;
@@ -30,6 +53,26 @@ NSSize resize_with_aspect_ratio(NSSize current_size, NSSize ideal_size)
 
   if (current_height > 240) {
 		adjust_height = 240 / current_height;
+  }
+
+	float adjust = adjust_height < adjust_width ? adjust_height : adjust_width;
+
+	return(NSMakeSize(current_width * adjust, current_height * adjust));
+}
+
+NSSize resize_with_hd_aspect_ratio(NSSize current_size, NSSize ideal_size)
+{
+	float current_width = current_size.width;
+	float current_height = current_size.height;
+	float adjust_width = 1.0;
+	float adjust_height = 1.0;
+
+  if (current_width > 1280) {
+		adjust_width = 1280 / current_width;
+  }
+
+  if (current_height > 960) {
+		adjust_height = 960 / current_height;
   }
 
 	float adjust = adjust_height < adjust_width ? adjust_height : adjust_width;
@@ -60,17 +103,32 @@ QTMovie *open_movie(char *file)
   return (movie);
 }
 
-NSString *append_path_extension(NSString *path, NSString *ext)
+void encode_hd_movie(QTMovie *movie, char *dest)
 {
-  NSString *path_with_extension = nil;
+  NSSize encoded_movie_dimensions =
+    resize_with_hd_aspect_ratio(
+      [[movie attributeForKey:QTMovieNaturalSizeAttribute] sizeValue],
+      NSMakeSize(1280, 960));
   
-  // Remove the extension (if present), then add the new one.
-  path_with_extension =
-    [[path stringByDeletingPathExtension] stringByAppendingPathExtension:ext];
-          
-  NSLog(@"Path: %@", path_with_extension);
+  NSLog(@"Encoded video dimensions: %@", NSStringFromSize(encoded_movie_dimensions));
   
-  return (path_with_extension);
+  if ((encoded_movie_dimensions.width <= 320 ) || (encoded_movie_dimensions.height <= 240)) {
+    return;
+  }
+  
+  [movie setAttribute:[NSValue valueWithSize:
+             NSMakeSize(1280, 960)]
+         forKey: QTMovieCurrentSizeAttribute];
+  
+  NSDictionary *dictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                [NSNumber numberWithBool:YES], QTMovieExport,
+                [NSNumber numberWithLong:'mpg4'], QTMovieExportType, nil];
+  
+  NSString *dest_with_hd_extension = append_hd_extension([NSString stringWithCString:dest]);
+  
+  NSLog(@"HD File: %@", dest_with_hd_extension);
+  
+  [movie writeToFile:dest_with_hd_extension withAttributes:dictionary];
 }
 
 void encode_movie(QTMovie *movie, char *dest)
@@ -92,7 +150,7 @@ void encode_movie(QTMovie *movie, char *dest)
   
   NSString *dest_with_flv_extension =
     append_path_extension([NSString stringWithCString:dest], @"flv");
-    
+  
   [movie writeToFile:dest_with_flv_extension withAttributes:dictionary];
 }
 
@@ -137,6 +195,7 @@ int main (int ac, char**av)
     {
       // Export movie and thumbnail
       encode_movie(movie, output);
+      encode_hd_movie(movie, output);
       export_thumbnail(movie, output);
     }
     else

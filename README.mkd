@@ -1,0 +1,5 @@
+Install FLV Components
+----------------------
+
+Copy src/FLV.component into /Library/QuickTime
+

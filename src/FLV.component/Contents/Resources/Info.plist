@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>FLV</string>
+	<key>CFBundleGetInfoString</key>
+	<string>Flash Video Exporter VERSION_USER BUILD_CODE, Copyright © 2003-2007 Adobe Systems Incorporated. All rights reserved.</string>
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string>com.macromedia.FLVExporter</string>
+	<key>CFBundleLongVersionString</key>
+	<string>Flash Video Exporter VERSION_NUMBER</string>
+	<key>CFBundleName</key>
+	<string>FLV Exporter</string>
+	<key>CFBundlePackageType</key>
+	<string>thng</string>
+	<key>CFBundleShortVersionString</key>
+	<string>VERSION_NUMBER</string>
+	<key>CFBundleSignature</key>
+	<string>FLV2</string>
+	<key>CFBundleVersion</key>
+	<string>VERSION_USER BUILD_CODE</string>
+	<key>CSResourcesFileMapped</key>
+	<true/>
+</dict>
+</plist>

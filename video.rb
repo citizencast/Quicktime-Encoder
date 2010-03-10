@@ -14,21 +14,18 @@ DataMapper.setup(:default, "sqlite3:///#{Dir.pwd}/db/db.sqlite3")
 require 'config/env.rb' if File.exists?('config/env.rb')
 
 def connect_to_s3
-  AWS::S3::Base.establish_connection!(
-    :access_key_id     =>  ENV['AMAZON_ACCESS_KEY_ID'],
-    :secret_access_key =>  ENV['AMAZON_SECRET_ACCESS_KEY']
-  ) unless AWS::S3::Base.connected?
+  AWS::S3::Base.establish_connection!(S3_CREDENTIALS) unless AWS::S3::Base.connected?
 end
 
 class Video
   include DataMapper::Resource
   
-  property :id,                   Integer,  :serial => true
-  property :url,                  String,   :size => 200
+  property :id,                   Serial
+  property :url,                  String,   :length => 200
   property :size,                 Integer
   property :success,              Boolean
-  property :thumbnail,            String,   :size => 200
-  property :video,                String,   :size => 200
+  property :thumbnail,            String,   :length => 200
+  property :video,                String,   :length => 200
   
   def file= file_path
     @file = File.new(file_path)
@@ -102,8 +99,7 @@ class Video
   
   def upload_to_s3
     connect_to_s3
-
-    ['.flv', '.jpg'].each do |ext|
+    ['.flv', '.jpg', '.mp4'].each do |ext|
       path = title + ext
       puts "Uploading #{path}..."
       AWS::S3::S3Object.store(path, File.open(path), 'encoded-videos', :access => :public_read)

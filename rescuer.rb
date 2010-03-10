@@ -96,8 +96,8 @@ class Rescuer
     true
   end
 
-  def tell_rails result
-    url = "#{REVELATR}/#{result}/#{SECRET}/#{s3_name}"
+  def tell_rails result, hd = false
+    url = "#{REVELATR}/#{result}/#{SECRET}/#{s3_name}?hd=#{hd}"
     Net::HTTP.post_form(URI(url), "_method" => "PUT")
     puts "updated revelatR: #{result}"
     true
