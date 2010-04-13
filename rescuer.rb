@@ -1,3 +1,4 @@
+require 'logger'
 require 'rubygems'
 require 'net/http'
 require 'uri'
@@ -24,6 +25,7 @@ class Rescuer
   end
 
   def self.do_rescue
+    logger.info "\n\nstarting rescue at #{Time.now}"
     open("#{REVELATR}/en/last_failed_encoding") { |response|
       name = response.readline.split "."
       Rescuer.new(name[0], name[1]).rescue_video
@@ -104,7 +106,7 @@ class Rescuer
     true
   end
   
-  def logger
+  def self.logger
     @rescue_log ||= returning(Logger.new("log/rescue.log", 'weekly')) { |lg| lg.level = Logger::INFO }
   end
   
