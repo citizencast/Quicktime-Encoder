@@ -26,10 +26,11 @@ end
 namespace :app do
   desc "Encode videos"
   task(:encode) do
-    require 'video'
-
-    Video.fetch_non_encoded_videos.each do |video|
-      video.proceed
-    end
+    require 'rescuer'
+    Rescuer.do_rescue
+    # require 'video'
+    # Video.fetch_non_encoded_videos.each do |video|
+      # video.proceed
+    # end
   end
 end

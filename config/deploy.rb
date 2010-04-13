@@ -4,9 +4,9 @@ set :scm, :git
 set :use_sudo, false
 set :deploy_to, "~/revelatr/encoding"
 
-role :app, "192.168.0.3"
-role :web, "192.168.0.3"
-role :db,  "192.168.0.3", :primary => true
+role :app, "192.168.1.11"
+role :web, "192.168.1.11"
+role :db,  "192.168.1.11", :primary => true
 
 namespace :deploy do
   def current_or_latest_directory
