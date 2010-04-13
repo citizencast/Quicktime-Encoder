@@ -36,7 +36,7 @@ class Rescuer
   
   def rescue_video
     logger.info "rescuing #{original}"
-    (download && encode && upload && tell_rails("encoding_rescued")) || tell_rails("encoding_rescue_failed")
+    (tell_rails("in_progress") && download && encode && upload && tell_rails("rescued")) || tell_rails("failed")
   rescue Interrupt => ipt
     logger.info "interrupt, stopping"
   rescue Exception => e
@@ -94,7 +94,7 @@ class Rescuer
   end
 
   def tell_rails result, hd = false
-    url = "#{REVELATR}/#{result}/#{SECRET}/#{s3_name}?hd=#{hd}"
+    url = "#{REVELATR}/rescue/#{result}/#{SECRET}/#{s3_name}?hd=#{hd}"
     Net::HTTP.post_form(URI(url), "_method" => "PUT")
     logger.info "updated revelatR: #{result}"
     true

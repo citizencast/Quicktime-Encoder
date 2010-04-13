@@ -21,6 +21,6 @@
 
 set :path, '~/revelatr/encoding/current' 
 
-every 20.minutes do
+every 30.minutes do
   rake "app:encode"
 end
