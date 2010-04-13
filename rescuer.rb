@@ -48,7 +48,7 @@ class Rescuer
   def encode
     cmd = "./bin/encoder #{original} #{s3_name}"
     logger.info cmd
-    system(cmd)
+    logger.info `#{cmd}`
     
     File.exist?("#{s3_name}.flv") && File.exist?("#{s3_name}.jpg")
   end
