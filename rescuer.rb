@@ -101,7 +101,12 @@ class Rescuer
   end
   
   def self.logger
-    @rescue_log ||= returning(Logger.new("log/rescue.log", 'weekly')) { |lg| lg.level = Logger::INFO }
+    @@rescue_log ||= returning(Logger.new("log/rescue.log", 'weekly')) { |lg| lg.level = Logger::INFO }
   end
   
+  def logger
+    Rescuer.logger
+  end
 end
+
+
