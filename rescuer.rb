@@ -5,7 +5,7 @@ require 'open-uri'
 require 'progressbar'
 require 'aws/s3'
 
-require 'config/env.rb' if File.exist?('config/env.rb')
+require 'config/env.rb'
 
 def connect_to_s3
   AWS::S3::Base.establish_connection!(S3_CREDENTIALS) unless AWS::S3::Base.connected?
