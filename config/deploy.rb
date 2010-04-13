@@ -46,7 +46,8 @@ namespace :deploy do
   desc "Set up symb links"
   task :symlinks, :roles => :app do
     run <<-CMD
-      ln -s #{shared_path}/db.sqlite3 #{latest_release}/db
+      ln -s #{shared_path}/db.sqlite3 #{latest_release}/db && \
+      ln -s #{shared_path}/env.rb #{latest_release}/config
     CMD
   end
   after "deploy:finalize_update", "deploy:symlinks"
