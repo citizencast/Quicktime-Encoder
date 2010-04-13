@@ -61,14 +61,8 @@ class Rescuer
     Net::HTTP.get_response(uri) do |res|
       size = res.header['Content-Length'].to_i
       logger.info "rescuing #{original}, #{size} bytes"
-      prog = ProgressBar.new(s3_name, size)
-      prog.file_transfer_mode
-      down = 0
-      dots = 0
       res.read_body do |chunk|
         file.write(chunk)
-        down += chunk.size
-        prog.set down
       end
     end
 
