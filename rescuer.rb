@@ -24,7 +24,7 @@ class Rescuer
   end
 
   def self.do_rescue
-    open("#{REVELATR}/last_failed_encoding") { |response|
+    open("#{REVELATR}/en/last_failed_encoding") { |response|
       name = response.readline.split "."
       Rescuer.new(name[0], name[1]).rescue_video
     }
