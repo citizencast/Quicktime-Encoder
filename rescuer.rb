@@ -29,22 +29,22 @@ class Rescuer
       Rescuer.new(name[0], name[1]).rescue_video
     }
   rescue OpenURI::HTTPError => e
-    puts "nothing to rescue: #{e.inspect}"
+    logger.info "nothing to rescue: #{e.inspect}"
   end
   
   def rescue_video
     (download && encode && upload && tell_rails("encoding_rescued")) || tell_rails("encoding_rescue_failed")
   rescue Interrupt => ipt
-    puts "interrupt, stopping"
+    logger.info "interrupt, stopping"
   rescue Exception => e
-    puts "rescue failed: updating server: #{e.class}"
-    puts e.backtrace
+    logger.info "rescue failed: updating server: #{e.class}"
+    logger.info e.backtrace
     tell_rails("encoding_rescue_failed")
   end
 
   def encode
     cmd = "./bin/encoder #{original} #{s3_name}"
-    puts cmd
+    logger.info cmd
     system(cmd)
     
     File.exist?("#{s3_name}.flv") && File.exist?("#{s3_name}.jpg")
@@ -57,7 +57,7 @@ class Rescuer
 
     Net::HTTP.get_response(uri) do |res|
       size = res.header['Content-Length'].to_i
-      puts "rescuing #{original}, #{size} bytes"
+      logger.info "rescuing #{original}, #{size} bytes"
       prog = ProgressBar.new(s3_name, size)
       prog.file_transfer_mode
       down = 0
@@ -72,7 +72,7 @@ class Rescuer
     print "\n"
     
     file.close
-    puts "downloaded to #{file.path}"
+    logger.info "downloaded to #{file.path}"
     true
   end
 
@@ -81,17 +81,17 @@ class Rescuer
 
     ['flv', 'jpg'].each do |encext|
       path = "#{s3_name}.#{encext}"
-      puts ""
-      print "Uploading to http://s3.amazonaws.com/encoded-videos/#{path} ..."
+      logger.info ""
+      logger.info "Uploading to http://s3.amazonaws.com/encoded-videos/#{path} ..."
       STDOUT.flush
       begin
         AWS::S3::S3Object.store(path, File.open(path), 'encoded-videos', :access => :public_read)
       rescue Exception => e
-        puts "couldn't upload #{path}, got #{e.inspect}"
-        puts e.backtrace
+        logger.info "couldn't upload #{path}, got #{e.inspect}"
+        logger.info e.backtrace
         raise e
       end
-      puts " ... done"
+      logger.info " ... done"
     end
     true
   end
@@ -99,7 +99,12 @@ class Rescuer
   def tell_rails result, hd = false
     url = "#{REVELATR}/#{result}/#{SECRET}/#{s3_name}?hd=#{hd}"
     Net::HTTP.post_form(URI(url), "_method" => "PUT")
-    puts "updated revelatR: #{result}"
+    logger.info "updated revelatR: #{result}"
     true
   end
+  
+  def logger
+    @rescue_log ||= returning(Logger.new("log/rescue.log", 'weekly')) { |lg| lg.level = Logger::INFO }
+  end
+  
 end
