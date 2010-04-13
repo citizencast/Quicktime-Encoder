@@ -33,6 +33,7 @@ class Rescuer
   end
   
   def rescue_video
+    logger.info "rescuing #{original}"
     (download && encode && upload && tell_rails("encoding_rescued")) || tell_rails("encoding_rescue_failed")
   rescue Interrupt => ipt
     logger.info "interrupt, stopping"
