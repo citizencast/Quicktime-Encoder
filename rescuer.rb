@@ -76,7 +76,7 @@ class Rescuer
   def upload
     connect_to_s3
 
-    ['flv', 'jpg'].each do |encext|
+    ['flv', 'jpg', "-HD.mp4"].each do |encext|
       path = "#{s3_name}.#{encext}"
       logger.info ""
       logger.info "Uploading to http://s3.amazonaws.com/encoded-videos/#{path} ..."
@@ -96,7 +96,7 @@ class Rescuer
   def tell_rails result, hd = false
     url = "#{REVELATR}/rescue/#{result}/#{SECRET}/#{s3_name}?hd=#{hd}"
     Net::HTTP.post_form(URI(url), "_method" => "PUT")
-    logger.info "updated revelatR: #{result}"
+    logger.info "updated #{REVELATR}: #{result}"
     true
   end
   
